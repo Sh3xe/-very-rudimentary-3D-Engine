@@ -6,7 +6,38 @@ canvas.height = window.innerHeight;
 
 //Variables
 
-let points = [[]];
+let points = [[0, 0, 0], [0, 1, 0], [1, 1, 0], [1, 0, 0], [0, 0, 1], [0, 1, 1], [1, 1, 1], [1, 0, 1]];
+
+
+//Functions
+function rotateMatrix(x, y, z, m){
+    if(x != 0){
+        let rotation_x=[[ 1,            0,           0],
+                        [ 0,  Math.cos(x), Math.sin(x)],
+                        [ 0, -Math.cos(x), Math.sin(x)]];
+        m = mulMat(m, rotation_x);
+    }
+    if(y != 0){
+        let rotation_y=[[ Math.cos(y), 0, -Math.sin(y)],
+                        [           0, 1,            0],
+                        [ Math.sin(y), 0,  Math.cos(y)]];
+        m = mulMat(m, rotation_y);
+    }
+    if(z != 0){
+        let rotation_z=[[  Math.cos(z), Math.sin(z), 0],
+                        [ -Math.cos(z), Math.sin(z), 0],
+                        [            0,           0, 1]];
+        console.log(rotation_z);
+        m = mulMat(m, rotation_z);
+    }
+    return m;
+}
+
+function degToRad(deg){
+    return (deg * 2 * Math.PI) / 360;
+}
+
+//Classes
 
 // VECTOR CLASS
 function dot(v1, v2){
@@ -43,14 +74,18 @@ class CordinateSpace{
         this.location = v;
         this.matrix   = m;
     }
+
+    rotate(x, y, z){
+        this.matrix = rotateMatrix(this.matrix, x, y, z);
+    }
 }
 
-let m1=[[ 2, 3, 0],
-        [ 0, 1, 2],
-        [ 1, 1, 1]];
+let m1=[[ 1, 0, 0],
+        [ 0, 1, 0],
+        [ 0, 0, 1]];
     
 let m2=[[ 2, 3, 0],
         [ 0, 1, 2],
         [ 1, 1, 1]];
 
-console.log(mulMat(m1, m2));
+console.log(rotateMatrix(0, 0, degToRad(45), m1));
