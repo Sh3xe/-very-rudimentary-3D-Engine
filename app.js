@@ -7,8 +7,8 @@ canvas.height = window.innerHeight;
 //Variables
 mouse = {x:0, y:0}
 window.onmousemove = e=>{
-    mouse.x = e.x;
-    mouse.y = e.y;
+    mouse.x = e.x - window.innerWidth *0.5;
+    mouse.y = e.y - window.innerHeight *0.5;
 };
 
 //let points = [[0, 0, 0], [0, 1, 0], [1, 1, 0], [1, 0, 0], [0, 0, 1], [0, 1, 1], [1, 1, 1], [1, 0, 1]];
@@ -105,7 +105,11 @@ let cube_space = new CoordinateSpace([100, 200, 0], IDENTITY_MATRIX);
 
 function drawToCanvas(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    cube_space.rotate(0, 0, 45);
+
+    cube_space.location[0] = mouse.x;
+    cube_space.location[1] = mouse.y;
+
+    //cube_space.rotate(0, 0, 45);
 
     for(let p of points){
         //converting points to world space
@@ -122,9 +126,9 @@ function drawToCanvas(){
         ctx.arc(x , y, 5, 0, Math.PI*2 );
         ctx.fill();
 
-        console.log(x, y);
+        //console.log(x, y);
     }
 }
 
-drawToCanvas();
-//setInterval(drawToCanvas, 100);
+//drawToCanvas();
+setInterval(drawToCanvas, 50);
