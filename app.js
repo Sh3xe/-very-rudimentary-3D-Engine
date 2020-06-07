@@ -13,7 +13,9 @@ window.onmousemove = e=>{
 
 //let points = [[0, 0, 0], [0, 1, 0], [1, 1, 0], [1, 0, 0], [0, 0, 1], [0, 1, 1], [1, 1, 1], [1, 0, 1]];
 
-let points = [[0, 0, 100], [0, 100, 100], [100, 100, 100], [100, 0, 100], [0, 0, 200], [0, 100, 200], [100, 100, 200], [100, 0, 200]];
+//let points = [[0, 0, 100], [0, 100, 100], [100, 100, 100], [100, 0, 100], [0, 0, 200], [0, 100, 200], [100, 100, 200], [100, 0, 200]];
+
+let mesh_list = [[[0, 0, 100], [0, 100, 100], [100, 100, 100]], [[0, 0, 100], [100, 0, 100], [100, 100, 100]], [[0, 0, 200], [0, 100, 200], [100, 100, 200]], [[0, 0, 200], [100, 0, 200], [100, 100, 200]], [[0, 0, 200], [0, 0, 100], [0, 100, 100]], [[0, 0, 200], [0, 100, 200], [0, 100, 100]], [[100, 0, 200], [100, 100, 200], [100, 100, 100]], [[100, 0, 200], [100, 0, 100], [100, 100, 100]], [[0, 0, 100], [100, 0, 100], [0, 0, 200]], [[0, 100, 100], [100, 100, 100], [0, 100, 200]]];
 
 const IDENTITY_MATRIX = [[1, 0, 0],
            [0, 1, 0],
@@ -24,7 +26,7 @@ function rotateMatrix(x, y, z, m){
     if(x != 0){
         let rotation_x=[[ 1,            0,           0],
                         [ 0,  Math.cos(x), Math.sin(x)],
-                        [ 0, -Math.cos(x), Math.sin(x)]];
+                        [ 0, -Math.sin(x), Math.cos(x)]];
         m = mulMat(m, rotation_x);
     }
     if(y != 0){
@@ -35,19 +37,40 @@ function rotateMatrix(x, y, z, m){
     }
     if(z != 0){
         let rotation_z=[[  Math.cos(z), Math.sin(z), 0],
-                        [ -Math.cos(z), Math.sin(z), 0],
+                        [ -Math.sin(z), Math.cos(z), 0],
                         [            0,           0, 1]];
-        console.log(m);
+        //console.log(m);
         m = mulMat(m, rotation_z);
-        console.log(m);
+        //console.log(m);
     }
     return m;
 }
 
 function degToRad(deg){
+    //0.017453292519943295
     return (deg * 2 * Math.PI) / 360;
 }
 
+function drawMeshes(mesh_list){
+    for(let mesh of mesh_list){
+        
+        p1 = projectPoint(cube_space.toWorld(mesh[0]));
+        p2 = projectPoint(cube_space.toWorld(mesh[1]));
+        p3 = projectPoint(cube_space.toWorld(mesh[2]));
+        
+        ctx.beginPath();
+        ctx.strokeStyle = "red";
+        ctx.moveTo(p1[0], p1[1]);
+        ctx.lineTo(p2[0], p2[1]);
+        ctx.lineTo(p3[0], p3[1]);
+        ctx.lineTo(p1[0], p1[1]);
+        ctx.stroke();
+    }
+}
+
+function projectPoint(p){
+    return [((p[0] / p[2]) * 100) + canvas.width / 2, ((p[1] / p[2]) * 100) + canvas.height / 2];
+}
 //Classes
 
 // VECTOR CLASS
@@ -103,32 +126,16 @@ class CoordinateSpace{
 //Main
 let cube_space = new CoordinateSpace([100, 200, 0], IDENTITY_MATRIX);
 
+cube_space.translate(0, 0, 290);
 function drawToCanvas(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     cube_space.location[0] = mouse.x;
     cube_space.location[1] = mouse.y;
 
-    //cube_space.rotate(0, 0, 45);
-
-    for(let p of points){
-        //converting points to world space
-        p = cube_space.toWorld(p);
-        
-        let x = (p[0] / p[2]) * 100;
-        let y = (p[1] / p[2]) * 100;
-        
-        x += canvas.width / 2;
-        y += canvas.height / 2;
-
-        ctx.beginPath();
-        ctx.fillStyle = "black";
-        ctx.arc(x , y, 5, 0, Math.PI*2 );
-        ctx.fill();
-
-        //console.log(x, y);
-    }
+    cube_space.rotate(1, 1, 1);
+    drawMeshes(mesh_list);
 }
 
 //drawToCanvas();
-setInterval(drawToCanvas, 50);
+setInterval(drawToCanvas, 16);
