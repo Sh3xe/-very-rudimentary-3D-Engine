@@ -102,5 +102,6 @@ function drawToCanvas(){
         console.log(x +200, y+100);
     }
 }
+
 drawToCanvas();
 //setInterval(drawToCanvas, 100);
