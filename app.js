@@ -11,15 +11,9 @@ window.onmousemove = e=>{
     mouse.y = e.y - window.innerHeight *0.5;
 };
 
-//let points = [[0, 0, 0], [0, 1, 0], [1, 1, 0], [1, 0, 0], [0, 0, 1], [0, 1, 1], [1, 1, 1], [1, 0, 1]];
-
-//let points = [[0, 0, 100], [0, 100, 100], [100, 100, 100], [100, 0, 100], [0, 0, 200], [0, 100, 200], [100, 100, 200], [100, 0, 200]];
-
-let mesh_list = [[[0, 0, 100], [0, 100, 100], [100, 100, 100]], [[0, 0, 100], [100, 0, 100], [100, 100, 100]], [[0, 0, 200], [0, 100, 200], [100, 100, 200]], [[0, 0, 200], [100, 0, 200], [100, 100, 200]], [[0, 0, 200], [0, 0, 100], [0, 100, 100]], [[0, 0, 200], [0, 100, 200], [0, 100, 100]], [[100, 0, 200], [100, 100, 200], [100, 100, 100]], [[100, 0, 200], [100, 0, 100], [100, 100, 100]], [[0, 0, 100], [100, 0, 100], [0, 0, 200]], [[0, 100, 100], [100, 100, 100], [0, 100, 200]]];
-
-const IDENTITY_MATRIX = [[1, 0, 0],
-           [0, 1, 0],
-           [0, 0, 1]];
+const IDENTITY_MATRIX =[[1, 0, 0],
+                        [0, 1, 0],
+                        [0, 0, 1]];
 
 //Functions
 function rotateMatrix(x, y, z, m){
@@ -126,6 +120,14 @@ class CoordinateSpace{
 //Main
 let cube_space = new CoordinateSpace([100, 200, 0], IDENTITY_MATRIX);
 
+document.addEventListener('keydown', function(event) {
+    if (event.keyCode == 38) {
+        cube_space.location[2] += 10
+    }else if (event.keyCode == 40) {
+        cube_space.location[2] -= 10
+    }
+});
+
 cube_space.translate(0, 0, 290);
 function drawToCanvas(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -133,7 +135,7 @@ function drawToCanvas(){
     cube_space.location[0] = mouse.x;
     cube_space.location[1] = mouse.y;
 
-    cube_space.rotate(1, 1, 1);
+    cube_space.rotate(0, 1, 1);
     drawMeshes(mesh_list);
 }
 
