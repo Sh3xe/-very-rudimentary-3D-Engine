@@ -2,13 +2,13 @@ let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 
 canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.height = window.innerHeight * 0.95; // don't get the scrolling option *0.95
 
 //Variables
 mouse = {x:0, y:0}
 window.onmousemove = e=>{
     mouse.x = e.x - window.innerWidth *0.5;
-    mouse.y = e.y - window.innerHeight *0.5;
+    mouse.y = e.y - window.innerHeight * 0.95 * 0.5;
 };
 
 const IDENTITY_MATRIX =[[1, 0, 0],
@@ -135,9 +135,10 @@ function drawToCanvas(){
     cube_space.location[0] = mouse.x;
     cube_space.location[1] = mouse.y;
 
-    cube_space.rotate(0, 1, 1);
+    cube_space.rotate(2, 1, 1);
     drawMeshes(mesh_list);
+    requestAnimationFrame(drawToCanvas);
 }
 
 //drawToCanvas();
-setInterval(drawToCanvas, 16);
+drawToCanvas();
