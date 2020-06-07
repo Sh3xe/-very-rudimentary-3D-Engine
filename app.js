@@ -5,9 +5,13 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 //Variables
+//let points = [[0, 0, 0], [0, 1, 0], [1, 1, 0], [1, 0, 0], [0, 0, 1], [0, 1, 1], [1, 1, 1], [1, 0, 1]];
 
-let points = [[0, 0, 0], [0, 1, 0], [1, 1, 0], [1, 0, 0], [0, 0, 1], [0, 1, 1], [1, 1, 1], [1, 0, 1]];
+let points = [[0, 0, 1], [0, 1, 1], [1, 1, 1], [1, 0, 1], [0, 0, 2], [0, 1, 2], [1, 1, 2], [1, 0, 2]];
 
+const IDENTITY_MATRIX = [[1, 0, 0],
+           [0, 1, 0],
+           [0, 0, 1]];
 
 //Functions
 function rotateMatrix(x, y, z, m){
@@ -68,7 +72,7 @@ function mulMat(m1, m2){
 }
 
 // COORDINATE SPACE
-class CordinateSpace{
+class CoordinateSpace{
     constructor(v, m){
         this.location = v;
         this.matrix   = m;
@@ -77,22 +81,26 @@ class CordinateSpace{
     rotate(x, y, z){
         this.matrix = rotateMatrix(this.matrix, x, y, z);
     }
-}
-/*
-let m1=[[ 1, 0, 0],
-        [ 0, 1, 0],
-        [ 0, 0, 1]];
-    
-let m2=[[ 2, 3, 0],
-        [ 0, 1, 2],
-        [ 1, 1, 1]];
 
-console.log(rotateMatrix(0, 0, degToRad(45), m1));
-*/
+    toWorld(p){
+        let point = mulMatVec(p, this.matrix);
+        return [point[0] + this.location[0], point[1] + this.location[1], point[2] + this.location[2]];
+    }
+}
+
+//Main
+let cube_space = new CoordinateSpace([100, 100, 0], IDENTITY_MATRIX);
 
 function drawToCanvas(){
     for(let p of points){
         ctx.beginPath();
+        ctx.fillStyle = "black";
+        let x = (p[0] / p[2])*100;
+        let y = (p[1] / p[2])*100;
+        ctx.arc( 400 +x , 200 + y, 5, 0, Math.PI*2 );
+        ctx.fill();
+        console.log(x +200, y+100);
     }
 }
-setInterval(drawToCanvas, 100);
+drawToCanvas();
+//setInterval(drawToCanvas, 100);
