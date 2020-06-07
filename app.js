@@ -5,9 +5,15 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 //Variables
+mouse = {x:0, y:0}
+window.onmousemove = e=>{
+    mouse.x = e.x;
+    mouse.y = e.y;
+};
+
 //let points = [[0, 0, 0], [0, 1, 0], [1, 1, 0], [1, 0, 0], [0, 0, 1], [0, 1, 1], [1, 1, 1], [1, 0, 1]];
 
-let points = [[0, 0, 1], [0, 1, 1], [1, 1, 1], [1, 0, 1], [0, 0, 2], [0, 1, 2], [1, 1, 2], [1, 0, 2]];
+let points = [[0, 0, 100], [0, 100, 100], [100, 100, 100], [100, 0, 100], [0, 0, 200], [0, 100, 200], [100, 100, 200], [100, 0, 200]];
 
 const IDENTITY_MATRIX = [[1, 0, 0],
            [0, 1, 0],
@@ -31,7 +37,9 @@ function rotateMatrix(x, y, z, m){
         let rotation_z=[[  Math.cos(z), Math.sin(z), 0],
                         [ -Math.cos(z), Math.sin(z), 0],
                         [            0,           0, 1]];
+        console.log(m);
         m = mulMat(m, rotation_z);
+        console.log(m);
     }
     return m;
 }
@@ -79,7 +87,11 @@ class CoordinateSpace{
     }
 
     rotate(x, y, z){
-        this.matrix = rotateMatrix(this.matrix, x, y, z);
+        this.matrix = rotateMatrix(degToRad(x), degToRad(y), degToRad(z), this.matrix);
+    }
+
+    translate(x, y, z){
+        this.location = [this.location[0] + x, this.location[1] + y, this.location[2] + z,]
     }
 
     toWorld(p){
@@ -89,17 +101,28 @@ class CoordinateSpace{
 }
 
 //Main
-let cube_space = new CoordinateSpace([100, 100, 0], IDENTITY_MATRIX);
+let cube_space = new CoordinateSpace([100, 200, 0], IDENTITY_MATRIX);
 
 function drawToCanvas(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    cube_space.rotate(0, 0, 45);
+
     for(let p of points){
+        //converting points to world space
+        p = cube_space.toWorld(p);
+        
+        let x = (p[0] / p[2]) * 100;
+        let y = (p[1] / p[2]) * 100;
+        
+        x += canvas.width / 2;
+        y += canvas.height / 2;
+
         ctx.beginPath();
         ctx.fillStyle = "black";
-        let x = (p[0] / p[2])*100;
-        let y = (p[1] / p[2])*100;
-        ctx.arc( 400 +x , 200 + y, 5, 0, Math.PI*2 );
+        ctx.arc(x , y, 5, 0, Math.PI*2 );
         ctx.fill();
-        console.log(x +200, y+100);
+
+        console.log(x, y);
     }
 }
 
