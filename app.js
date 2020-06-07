@@ -27,7 +27,6 @@ function rotateMatrix(x, y, z, m){
         let rotation_z=[[  Math.cos(z), Math.sin(z), 0],
                         [ -Math.cos(z), Math.sin(z), 0],
                         [            0,           0, 1]];
-        console.log(rotation_z);
         m = mulMat(m, rotation_z);
     }
     return m;
@@ -79,7 +78,7 @@ class CordinateSpace{
         this.matrix = rotateMatrix(this.matrix, x, y, z);
     }
 }
-
+/*
 let m1=[[ 1, 0, 0],
         [ 0, 1, 0],
         [ 0, 0, 1]];
@@ -89,3 +88,11 @@ let m2=[[ 2, 3, 0],
         [ 1, 1, 1]];
 
 console.log(rotateMatrix(0, 0, degToRad(45), m1));
+*/
+
+function drawToCanvas(){
+    for(let p of points){
+        ctx.beginPath();
+    }
+}
+setInterval(drawToCanvas, 100);
