@@ -63,7 +63,7 @@ function drawMeshes(mesh_list){
 }
 
 function projectPoint(p){
-    return [((p[0] / p[2]) * 100) + canvas.width / 2, ((p[1] / p[2]) * 100) + canvas.height / 2];
+    return [((p[0] / p[2]*4) * 100) + canvas.width / 2, ((p[1] / p[2]*4) * 100) + canvas.height / 2];
 }
 //Classes
 
@@ -129,13 +129,15 @@ document.addEventListener('keydown', function(event) {
 });
 
 cube_space.translate(0, 0, 290);
+cube_space.rotate(180, 0, 0);
 function drawToCanvas(){
+    cube_space.rotate(0, 1, 0);
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     cube_space.location[0] = mouse.x;
     cube_space.location[1] = mouse.y;
 
-    cube_space.rotate(2, 1, 1);
     drawMeshes(mesh_list);
     requestAnimationFrame(drawToCanvas);
 }
