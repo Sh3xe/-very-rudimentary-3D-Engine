@@ -5,11 +5,12 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight * 0.95; // don't get the scrolling option *0.95
 
 //Variables
-mouse = {x:0, y:0}
+//mouse = {x:0, y:0}
+/*
 window.onmousemove = e=>{
     mouse.x = e.x - window.innerWidth *0.5;
     mouse.y = e.y - window.innerHeight * 0.95 * 0.5;
-};
+};*/
 
 const IDENTITY_MATRIX =[[1, 0, 0],
                         [0, 1, 0],
@@ -48,9 +49,21 @@ function degToRad(deg){
 function drawMeshes(mesh_list){
     for(let mesh of mesh_list){
         
-        p1 = projectPoint(cube_space.toWorld(mesh[0]));
-        p2 = projectPoint(cube_space.toWorld(mesh[1]));
-        p3 = projectPoint(cube_space.toWorld(mesh[2]));
+        let p1 = mesh[0];
+        let p2 = mesh[1];
+        let p3 = mesh[2];
+
+        p1 = cube_space.toWorld(p1);
+        p2 = cube_space.toWorld(p2);
+        p3 = cube_space.toWorld(p3);
+
+        p1 = camera.toCam(p1);
+        p2 = camera.toCam(p2);
+        p3 = camera.toCam(p3);
+
+        p1 = projectPoint(p1);
+        p2 = projectPoint(p2);
+        p3 = projectPoint(p3);
         
         ctx.beginPath();
         ctx.strokeStyle = "red";
@@ -96,7 +109,9 @@ function mulMat(m1, m2){
             [dot(m1[2], c1), dot(m1[2], c2), dot(m1[2], c3)]];
 }
 
-// COORDINATE SPACE
+
+
+// CLASSES
 class CoordinateSpace{
     constructor(v, m){
         this.location = v;
@@ -117,27 +132,119 @@ class CoordinateSpace{
     }
 }
 
+class Camera{
+    constructor(v, m){
+        this.location = v;
+        this.matrix = m;
+    }
+
+    toCam(p){
+        let point = [p[0] - this.location[0], p[1] - this.location[1], p[2] - this.location[2]];
+        return mulMatVec(point, this.matrix);
+    }
+
+    rotate(x, y, z){
+        this.matrix = rotateMatrix(degToRad(x), degToRad(y), degToRad(z), this.matrix);
+    }
+}
+
+let controller = {
+    x: 0,
+    y: 0,
+    z: 0,
+    cx: 0,
+    cy: 0
+}
 //Main
 let cube_space = new CoordinateSpace([100, 200, 0], IDENTITY_MATRIX);
+let camera = new Camera([0, 0, 0], IDENTITY_MATRIX);
 
+//This shit is horrible forgive me plz
 document.addEventListener('keydown', function(event) {
-    if (event.keyCode == 38) {
-        cube_space.location[2] += 10
-    }else if (event.keyCode == 40) {
-        cube_space.location[2] -= 10
+    switch(event.keyCode){
+        case 90:
+            controller.z = 1;
+            break;
+        case 83:
+            controller.z = -1;
+            break;
+        case 81:
+            controller.x = -1;
+            break;
+        case 68:
+            controller.x = 1;
+            break;
+        case 16:
+            controller.y = 1;
+            break;
+        case 32:
+            controller.y = -1;
+            break;
+
+        //cam
+        case 38:
+            controller.cx = -1;
+            break;
+        case 39:
+            controller.cy = -1;
+            break;
+        case 37:
+            controller.cy = 1;
+            break;
+        case 40:
+            controller.cx = 1;
+            break;
+    }
+});
+
+document.addEventListener('keyup', function(event) {
+    switch(event.keyCode){
+        case 90:
+            controller.z = 0;
+            break;
+        case 83:
+            controller.z = 0;
+            break;
+        case 81:
+            controller.x = 0;
+            break;
+        case 68:
+            controller.x = 0;
+            break;
+        case 16:
+            controller.y = 0;
+            break;
+        case 32:
+            controller.y = 0;
+        //cam
+        case 38:
+            controller.cx = 0;
+            break;
+        case 39:
+            controller.cy = 0;
+            break;
+        case 37:
+            controller.cy = 0;
+            break;
+        case 40:
+            controller.cx = 0;
+            break;
     }
 });
 
 cube_space.translate(0, 0, 290);
 cube_space.rotate(180, 0, 0);
 function drawToCanvas(){
-    cube_space.rotate(0, 1, 0);
+    cube_space.rotate(0, 0, 0);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    cube_space.location[0] = mouse.x;
-    cube_space.location[1] = mouse.y;
+    camera.location[0] += controller.x;
+    camera.location[1] += controller.y;
+    camera.location[2] += controller.z;
 
+    camera.rotate(controller.cx, controller.cy, 0);
+    console.log(camera.angle);
     drawMeshes(mesh_list);
     requestAnimationFrame(drawToCanvas);
 }
