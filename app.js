@@ -2,15 +2,9 @@ let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 
 canvas.width = window.innerWidth;
-canvas.height = window.innerHeight * 0.95; // don't get the scrolling option *0.95
+canvas.height = window.innerHeight * 0.99;
 
-//Variables
-//mouse = {x:0, y:0}
-/*
-window.onmousemove = e=>{
-    mouse.x = e.x - window.innerWidth *0.5;
-    mouse.y = e.y - window.innerHeight * 0.95 * 0.5;
-};*/
+const VIEWMODEL = 4; // 4 = normal, more = zoom, less = High fov
 
 const IDENTITY_MATRIX =[[1, 0, 0],
                         [0, 1, 0],
@@ -34,9 +28,7 @@ function rotateMatrix(x, y, z, m){
         let rotation_z=[[  Math.cos(z), Math.sin(z), 0],
                         [ -Math.sin(z), Math.cos(z), 0],
                         [            0,           0, 1]];
-        //console.log(m);
         m = mulMat(m, rotation_z);
-        //console.log(m);
     }
     return m;
 }
@@ -76,7 +68,7 @@ function drawMeshes(mesh_list){
 }
 
 function projectPoint(p){
-    return [((p[0] / p[2]*4) * 100) + canvas.width / 2, ((p[1] / p[2]*4) * 100) + canvas.height / 2];
+    return [((p[0] / p[2]*VIEWMODEL) * 100) + canvas.width / 2, ((p[1] / p[2]*VIEWMODEL) * 100) + canvas.height / 2];
 }
 //Classes
 
@@ -155,6 +147,7 @@ let controller = {
     cx: 0,
     cy: 0
 }
+
 //Main
 let cube_space = new CoordinateSpace([100, 200, 0], IDENTITY_MATRIX);
 let camera = new Camera([0, 0, 0], IDENTITY_MATRIX);
@@ -162,73 +155,30 @@ let camera = new Camera([0, 0, 0], IDENTITY_MATRIX);
 //This shit is horrible forgive me plz
 document.addEventListener('keydown', function(event) {
     switch(event.keyCode){
-        case 90:
-            controller.z = 1;
-            break;
-        case 83:
-            controller.z = -1;
-            break;
-        case 81:
-            controller.x = -1;
-            break;
-        case 68:
-            controller.x = 1;
-            break;
-        case 16:
-            controller.y = 1;
-            break;
-        case 32:
-            controller.y = -1;
-            break;
-
-        //cam
-        case 38:
-            controller.cx = -1;
-            break;
-        case 39:
-            controller.cy = -1;
-            break;
-        case 37:
-            controller.cy = 1;
-            break;
-        case 40:
-            controller.cx = 1;
-            break;
+        case 90: controller.z = 1;break;
+        case 83: controller.z = -1;break;
+        case 81: controller.x = -1;break;
+        case 68: controller.x = 1;break;
+        case 16: controller.y = 1;break;
+        case 32: controller.y = -1;break;
+        case 38: controller.cx = -1;break;
+        case 39: controller.cy = -1;break;
+        case 37: controller.cy = 1;break;
+        case 40: controller.cx = 1;break;
     }
 });
-
 document.addEventListener('keyup', function(event) {
     switch(event.keyCode){
-        case 90:
-            controller.z = 0;
-            break;
-        case 83:
-            controller.z = 0;
-            break;
-        case 81:
-            controller.x = 0;
-            break;
-        case 68:
-            controller.x = 0;
-            break;
-        case 16:
-            controller.y = 0;
-            break;
-        case 32:
-            controller.y = 0;
-        //cam
-        case 38:
-            controller.cx = 0;
-            break;
-        case 39:
-            controller.cy = 0;
-            break;
-        case 37:
-            controller.cy = 0;
-            break;
-        case 40:
-            controller.cx = 0;
-            break;
+        case 90: controller.z = 0;break;
+        case 83: controller.z = 0;break;
+        case 81: controller.x = 0;break;
+        case 68: controller.x = 0;break;
+        case 16: controller.y = 0;break;
+        case 32: controller.y = 0;break;
+        case 38: controller.cx = 0;break;
+        case 39: controller.cy = 0;break;
+        case 37: controller.cy = 0;break;
+        case 40: controller.cx = 0;break;
     }
 });
 
@@ -248,6 +198,4 @@ function drawToCanvas(){
     drawMeshes(mesh_list);
     requestAnimationFrame(drawToCanvas);
 }
-
-//drawToCanvas();
 drawToCanvas();
