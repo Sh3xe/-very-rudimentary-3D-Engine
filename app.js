@@ -12,23 +12,23 @@ const IDENTITY_MATRIX =[[1, 0, 0],
 
 //Functions
 function rotateMatrix(x, y, z, m){
-    if(x != 0){
-        let rotation_x=[[ 1,            0,           0],
-                        [ 0,  Math.cos(x), Math.sin(x)],
-                        [ 0, -Math.sin(x), Math.cos(x)]];
-        m = mulMat(m, rotation_x);
+	if(z != 0){
+        let rotation_z=[[  Math.cos(z), Math.sin(z), 0],
+                        [ -Math.sin(z), Math.cos(z), 0],
+                        [            0,           0, 1]];
+        m = mulMat(m, rotation_z);
     }
-    if(y != 0){
+	if(y != 0){
         let rotation_y=[[ Math.cos(y), 0, -Math.sin(y)],
                         [           0, 1,            0],
                         [ Math.sin(y), 0,  Math.cos(y)]];
         m = mulMat(m, rotation_y);
     }
-    if(z != 0){
-        let rotation_z=[[  Math.cos(z), Math.sin(z), 0],
-                        [ -Math.sin(z), Math.cos(z), 0],
-                        [            0,           0, 1]];
-        m = mulMat(m, rotation_z);
+    if(x != 0){
+        let rotation_x=[[ 1,            0,           0],
+                        [ 0,  Math.cos(x), Math.sin(x)],
+                        [ 0, -Math.sin(x), Math.cos(x)]];
+        m = mulMat(m, rotation_x);
     }
     return m;
 }
@@ -40,7 +40,7 @@ function degToRad(deg){
 
 function drawMeshes(mesh_list){
     for(let mesh of mesh_list){
-        
+		
         let p1 = mesh[0];
         let p2 = mesh[1];
         let p3 = mesh[2];
@@ -53,10 +53,13 @@ function drawMeshes(mesh_list){
         p2 = camera.toCam(p2);
         p3 = camera.toCam(p3);
 
+if(mesh == mesh_list[0]){debug_infos = p1}
+
         p1 = projectPoint(p1);
         p2 = projectPoint(p2);
         p3 = projectPoint(p3);
         
+		
         ctx.beginPath();
         ctx.strokeStyle = "red";
         ctx.moveTo(p1[0], p1[1]);
@@ -125,9 +128,10 @@ class CoordinateSpace{
 }
 
 class Camera{
-    constructor(v, m){
+    constructor(v, m, a){
         this.location = v;
         this.matrix = m;
+		this.angle = a;
     }
 
     toCam(p){
@@ -135,8 +139,11 @@ class Camera{
         return mulMatVec(point, this.matrix);
     }
 
-    rotate(x, y, z){
-        this.matrix = rotateMatrix(degToRad(x), degToRad(y), degToRad(z), this.matrix);
+    rotate(x, y){
+		this.angle[0] += x;
+		this.angle[1] += y;
+		
+        this.matrix = rotateMatrix(degToRad(this.angle[0]), degToRad(this.angle[1]), degToRad(180), IDENTITY_MATRIX);
     }
 }
 
@@ -150,7 +157,8 @@ let controller = {
 
 //Main
 let cube_space = new CoordinateSpace([100, 200, 0], IDENTITY_MATRIX);
-let camera = new Camera([0, 0, 0], IDENTITY_MATRIX);
+let camera = new Camera([0, 0, 0], IDENTITY_MATRIX, [0, 180, 0]);
+let debug_infos = {};
 
 //This shit is horrible forgive me plz
 document.addEventListener('keydown', function(event) {
@@ -165,6 +173,7 @@ document.addEventListener('keydown', function(event) {
         case 39: controller.cy = -1;break;
         case 37: controller.cy = 1;break;
         case 40: controller.cx = 1;break;
+		case 97: console.log(debug_infos);break;
     }
 });
 document.addEventListener('keyup', function(event) {
@@ -184,6 +193,7 @@ document.addEventListener('keyup', function(event) {
 
 cube_space.translate(0, 0, 290);
 cube_space.rotate(180, 0, 0);
+
 function drawToCanvas(){
     cube_space.rotate(0, 0, 0);
 
@@ -193,8 +203,8 @@ function drawToCanvas(){
     camera.location[1] += controller.y;
     camera.location[2] += controller.z;
 
-    camera.rotate(controller.cx, controller.cy, 0);
-    console.log(camera.angle);
+    camera.rotate(controller.cx, controller.cy);
+	
     drawMeshes(mesh_list);
     requestAnimationFrame(drawToCanvas);
 }
